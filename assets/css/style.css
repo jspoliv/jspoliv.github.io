@@ -1,0 +1,129 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  font-family: "PT Mono", monospace;
+  font-optical-sizing: auto;
+  /* font-weight: <weight>; */
+  font-style: normal;
+}
+
+:root {
+  --marg: min(1vh, 1vw);
+  --dim: min(100vh, 100vw);
+  --canvasDim: calc(var(--dim) - 2 * var(--marg));
+}
+
+.dark {
+  background-color: #1e1e1e;
+  color: aliceblue;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: top;
+}
+
+@media (min-aspect-ratio: 3/2) {
+  main {
+    flex-direction: row;
+  }
+}
+
+canvas {
+  display: block;
+  image-rendering: pixelated !important;
+  border: 1px solid #1E1E1E;
+  width: inherit !important;
+  height: inherit !important;
+}
+
+#mycanvas {
+  margin: var(--marg);
+  width: var(--canvasDim);
+  min-width: var(--canvasDim);
+  height: var(--canvasDim);
+  min-height: var(--canvasDim);
+}
+
+#menu {
+  margin: var(--marg);
+  height: auto;
+  width: auto;
+  max-width: var(--canvasDim);
+  display: flex;
+  flex-direction: column;
+}
+
+#header_bar {
+  margin-bottom: var(--marg);
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+}
+
+@media (min-aspect-ratio: 3/2) {
+  #header_bar {
+    justify-content: end;
+  }
+}
+
+#dark_btn, #light_btn {
+  border-radius: 1rem;
+}
+
+.hide {
+  display: none;
+}
+
+#form_grid {
+  margin-block: var(--marg);
+  display: grid;
+  gap: 5px;
+}
+
+.input_row {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+}
+
+label,
+.num_input,
+.rnd_btn,
+.submit_btn {
+  width: 50%;
+  text-align: center;
+  outline: none;
+}
+
+label {
+  background-color: whitesmoke;
+  color: black;
+  --b_radius: 0.25rem;
+  border-top-left-radius: var(--b_radius);
+  border-bottom-left-radius: var(--b_radius);
+  border: 1px solid grey;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+#results {
+  margin-top: var(--marg);
+  margin-bottom: 10vh;
+  background-color: whitesmoke;
+  color: black;
+  border-radius: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid #1E1E1E;
+}
+
+.bordered {
+  outline: 2px solid red;
+}

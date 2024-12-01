@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="htmx-config" content='{"selfRequestsOnly":false}' />
+
+    <title>A* Algorithm</title>
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico" />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylecheet -->
+    <link rel="stylesheet" type="text/css" href="./assets/css/style.css" />
+
+    <!-- P5.js -->
+    <script src="libraries/p5.min.js"></script>
+    <script src="libraries/p5.sound.min.js"></script>
+
+    <!-- HTMX -->
+    <script
+      src="https://unpkg.com/htmx.org@2.0.3"
+      integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Utility functions -->
+    <script defer src="./assets/js/dark.js"></script>
+    <script defer src="./assets/js/rnd.js"></script>
+    <script defer src="./assets/js/highlight.js"></script>
+  </head>
+
+  <body>
+    <main>
+      <div id="mycanvas"></div>
+      <div id="menu">
+        <div id="header_bar">
+          <button id="dark_btn" onclick="dark()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              style="fill: rgba(0, 0, 0, 1)"
+            >
+              <path
+                d="M20.742 13.045a8.088 8.088 0 0 1-2.077.271c-2.135 0-4.14-.83-5.646-2.336a8.025 8.025 0 0 1-2.064-7.723A1 1 0 0 0 9.73 2.034a10.014 10.014 0 0 0-4.489 2.582c-3.898 3.898-3.898 10.243 0 14.143a9.937 9.937 0 0 0 7.072 2.93 9.93 9.93 0 0 0 7.07-2.929 10.007 10.007 0 0 0 2.583-4.491 1.001 1.001 0 0 0-1.224-1.224zm-2.772 4.301a7.947 7.947 0 0 1-5.656 2.343 7.953 7.953 0 0 1-5.658-2.344c-3.118-3.119-3.118-8.195 0-11.314a7.923 7.923 0 0 1 2.06-1.483 10.027 10.027 0 0 0 2.89 7.848 9.972 9.972 0 0 0 7.848 2.891 8.036 8.036 0 0 1-1.484 2.059z"
+              ></path>
+            </svg>
+          </button>
+          <button id="light_btn" class="hide" onclick="dark()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              style="fill: rgba(0, 0, 0, 1)"
+            >
+              <path
+                d="M6.993 12c0 2.761 2.246 5.007 5.007 5.007s5.007-2.246 5.007-5.007S14.761 6.993 12 6.993 6.993 9.239 6.993 12zM12 8.993c1.658 0 3.007 1.349 3.007 3.007S13.658 15.007 12 15.007 8.993 13.658 8.993 12 10.342 8.993 12 8.993zM10.998 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2h-3zm17 0h3v2h-3zM4.219 18.363l2.12-2.122 1.415 1.414-2.12 2.122zM16.24 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.342 7.759 4.22 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+        <p>
+          Click on two pixels on the map to define a starting point and an end
+          point for the pathfinding.
+        </p>
+        <form id="form_grid" method="GET" enctype="multipart/form-data">
+          <div class="input_row">
+            <label for="dimension" class="highlight_map">Map Size (N)</label>
+            <input
+              id="dimension"
+              name="dimension"
+              class="num_input highlight_map"
+              type="number"
+              value="100"
+              min="5"
+              max="1000"
+              required
+            />
+            <button name="dimension" class="rnd_btn" onclick="rnd_bound(this)">
+              Randomize
+            </button>
+          </div>
+          <div class="input_row">
+            <label for="density" class="highlight_wall">Wall Amount (%)</label>
+            <input
+              id="density"
+              name="density"
+              class="num_input highlight_wall"
+              type="number"
+              value="30"
+              min="0"
+              max="30"
+              required
+            />
+            <button name="density" class="rnd_btn" onclick="rnd_bound(this)">
+              Randomize
+            </button>
+          </div>
+          <div class="input_row">
+            <label for="seed">Seed</label>
+            <input
+              id="seed"
+              name="seed"
+              class="num_input"
+              type="number"
+              value="99"
+              min="0"
+              max="999"
+              required
+            />
+            <button name="seed" class="rnd_btn" onclick="rnd_bound(this)">
+              Randomize
+            </button>
+          </div>
+          <div class="input_row">
+            <button
+              class="submit_btn"
+              hx-get="http://127.0.0.1:8080/solve"
+              hx-target="#results"
+              hx-swap="innerHtml"
+            >
+              SOLVE MAP
+            </button>
+            <button
+              class="submit_btn"
+              hx-get="http://127.0.0.1:8080/new_map"
+              hx-target="#map_response"
+              hx-swap="innerHtml"
+            >
+              GENERATE
+            </button>
+          </div>
+        </form>
+        <p>
+          <a class="highlight_map">The map has NxN pixels.</a>
+          Each color has it's own pathing cost (bluest = lowest; green = mid;
+          reddest = highest;
+          <a class="highlight_wall">black/wall = impassable terrain</a>).
+        </p>
+        <script>
+          var map_arr = "";
+        </script>
+        <div id="results">
+          <div id="map_response">
+            <script>
+              map_arr =
+                "#####7A7NXr/T#n#l'#*####n7h#Z*L#<uV?#_#*=]********#y*#!,7#R#t**wzd0#G#**##S#Or##*x#]#&##Q#O#)#>###:v";
+            </script>
+          </div>
+          <p>Pathing cost:<br />Time Elapsed:<br /></p>
+        </div>
+      </div>
+    </main>
+  </body>
+
+  <!-- JS for p5.js -->
+  <!-- <script src="./assets/js/test.js"></script> -->
+  <script defer src="./assets/js/sketch.js"></script>
+</html>
