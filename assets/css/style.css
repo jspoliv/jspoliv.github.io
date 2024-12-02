@@ -39,7 +39,7 @@ main {
 canvas {
   display: block;
   image-rendering: pixelated !important;
-  border: 1px solid #1E1E1E;
+  border: 1px solid #1e1e1e;
   width: inherit !important;
   height: inherit !important;
 }
@@ -74,7 +74,18 @@ canvas {
   }
 }
 
-#dark_btn, #light_btn {
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  #header_bar {
+    display: none;
+  }
+}
+
+#dark_btn,
+#light_btn {
   border-radius: 1rem;
 }
 
@@ -88,7 +99,8 @@ canvas {
   gap: 5px;
 }
 
-.input_row {
+.input_row,
+.submit_row {
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -106,22 +118,34 @@ label,
 label {
   background-color: whitesmoke;
   color: black;
+  border: 1px solid grey;
   --b_radius: 0.25rem;
   border-top-left-radius: var(--b_radius);
   border-bottom-left-radius: var(--b_radius);
-  border: 1px solid grey;
   white-space: nowrap;
   overflow: hidden;
 }
 
-#results {
+@media (prefers-color-scheme: dark) {
+  label {
+    background-color: inherit;
+    color: inherit;
+    /* border-color: inherit; */
+  }
+}
+
+a {
+  color: inherit;
+}
+
+#messageBoard {
   margin-top: var(--marg);
   margin-bottom: 10vh;
   background-color: whitesmoke;
   color: black;
   border-radius: 0.25rem;
   padding: 0.25rem;
-  border: 1px solid #1E1E1E;
+  border: 1px solid #1e1e1e;
 }
 
 .bordered {

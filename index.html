@@ -70,9 +70,25 @@
         </div>
         <p>
           Click on two pixels on the map to define a starting point and an end
-          point for the pathfinding.
+          point for the pathfinding. The starting and end points cannot be black
+          (walls/impassable terrain).
         </p>
-        <form id="form_grid" method="GET" enctype="multipart/form-data">
+        <form id="form_grid">
+          <!-- method="GET" enctype="multipart/form-data"-->
+          <input
+            type="hidden"
+            name="start"
+            id="start"
+            class="num_input"
+            value="-1"
+          />
+          <input
+            type="hidden"
+            name="goal"
+            id="goal"
+            class="num_input"
+            value="-1"
+          />
           <div class="input_row">
             <label for="dimension" class="highlight_map">Map Size (N)</label>
             <input
@@ -80,12 +96,17 @@
               name="dimension"
               class="num_input highlight_map"
               type="number"
-              value="100"
+              value="10"
               min="5"
               max="1000"
               required
             />
-            <button name="dimension" class="rnd_btn" onclick="rnd_bound(this)">
+            <button
+              name="dimension"
+              class="rnd_btn"
+              type="button"
+              onclick="rnd_bound(this)"
+            >
               Randomize
             </button>
           </div>
@@ -101,7 +122,12 @@
               max="30"
               required
             />
-            <button name="density" class="rnd_btn" onclick="rnd_bound(this)">
+            <button
+              name="density"
+              class="rnd_btn"
+              type="button"
+              onclick="rnd_bound(this)"
+            >
               Randomize
             </button>
           </div>
@@ -112,29 +138,39 @@
               name="seed"
               class="num_input"
               type="number"
-              value="99"
+              value="998"
               min="0"
               max="999"
               required
             />
-            <button name="seed" class="rnd_btn" onclick="rnd_bound(this)">
+            <button
+              name="seed"
+              class="rnd_btn"
+              type="button"
+              onclick="rnd_bound(this)"
+            >
               Randomize
             </button>
           </div>
-          <div class="input_row">
+          <div class="submit_row">
             <button
               class="submit_btn"
+              type="submit"
               hx-get="http://127.0.0.1:8080/solve"
               hx-target="#results"
               hx-swap="innerHtml"
+              hx-include=".num_input"
             >
               SOLVE MAP
             </button>
             <button
               class="submit_btn"
+              type="submit"
+              onclick="resetPos()"
               hx-get="http://127.0.0.1:8080/new_map"
               hx-target="#map_response"
               hx-swap="innerHtml"
+              hx-include=".num_input"
             >
               GENERATE
             </button>
@@ -149,15 +185,22 @@
         <script>
           var map_arr = "";
         </script>
-        <div id="results">
-          <div id="map_response">
-            <script>
-              map_arr =
-                "#####7A7NXr/T#n#l'#*####n7h#Z*L#<uV?#_#*=]********#y*#!,7#R#t**wzd0#G#**##S#Or##*x#]#&##Q#O#)#>###:v";
-            </script>
+        <div id="messageBoard">
+          <p>
+            <div id="startPos">Starting point: (-1,-1)</div>
+            <div id="goalPos">Ending point: (-1,-1)</div>
+          </p>
+          <div id="results">
+            <div id="map_response">
+              <script>
+                map_arr =
+                  "#####7A7NYr/T#n#l'#^####n7h#Z&L#<uV?#_#M=]$q$0b+m'#y.#!,7#R#ttIwzd0#G#XO##S#Or##}x#]#&##Q#S#)#>###:v";
+              </script>
+            </div>
+            <p>Pathing cost: -1<br />Time Elapsed: -1<br /></p>
           </div>
-          <p>Pathing cost:<br />Time Elapsed:<br /></p>
         </div>
+        
       </div>
     </main>
   </body>

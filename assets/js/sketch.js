@@ -63,32 +63,48 @@ function asciiToRgb() {
 function changeMap() {
   if (prev_dim == dim) {
     redraw();
-    return; 
+    return;
   }
   prev_dim = dim;
-  resizeCanvas(dim, dim); 
+  resizeCanvas(dim, dim);
 }
 
 function mouseClicked() {
-  if (mouseX < -2 || mouseX >= dim + 2 || mouseY < -2 || mouseY >= dim + 2)
+  if (mouseX < 0 || mouseX >= dim || mouseY < 0 || mouseY >= dim) return;
+  let tmp = [boundby(floor(mouseX), dim), boundby(floor(mouseY), dim)];
+  if (map_arr[tmp[0] + tmp[1] * dim] == "#") {
     return;
+  }
 
   if (mousePos[0] == -1) {
-    mousePos = [boundby(floor(mouseX), dim), boundby(floor(mouseY), dim)];
+    mousePos = tmp;
     redraw();
     set(mousePos[0], mousePos[1], 255);
     updatePixels();
-    fill("white");
+
+    changePos("start", mousePos[0], mousePos[1]);
+
+    var start = document.getElementById("start");
+    start.value = mousePos[0] + mousePos[1] * dim;
+    // fill("white");
     // text("c(" + (mousePos[0] + mousePos[1] * dim) + ")", 0, height / 8);
     // text("p(" + (mousePrev[0] + mousePrev[1] * dim) + ")", 0, height / 4);
   } else if (floor(mouseX) != mousePos[0] || floor(mouseY) != mousePos[1]) {
     mousePrev = mousePos;
-    mousePos = [boundby(floor(mouseX), dim), boundby(floor(mouseY), dim)];
+    mousePos = tmp;
     redraw();
-    set(mousePos[0], mousePos[1], 255);
     set(mousePrev[0], mousePrev[1], 255);
+    set(mousePos[0], mousePos[1], 255);
     updatePixels();
-    fill("white");
+
+    changePos("start", mousePrev[0], mousePrev[1]);
+    changePos("goal", mousePos[0], mousePos[1]);
+    
+    var start = document.getElementById("start");
+    start.value = mousePrev[0] + mousePrev[1] * dim;
+    var goal = document.getElementById("goal");
+    goal.value = mousePos[0] + mousePos[1] * dim;
+    // fill("white");
     // text("c(" + (mousePos[0] + mousePos[1] * dim) + ")", 0, height / 8);
     // text("p(" + (mousePrev[0] + mousePrev[1] * dim) + ")", 0, height / 4);
   }
@@ -98,4 +114,27 @@ function boundby(x, max) {
   if (x < 0) return 0;
   else if (x >= max) return max - 1;
   return x;
+}
+
+function resetPos() {
+  mousePrev = [-1, -1];
+  mousePos = [-1, -1];
+
+  changePos("start", -1, -1);
+  changePos("goal", -1, -1);
+
+  var start = document.getElementById("start");
+  start.value = -1;
+  var goal = document.getElementById("goal");
+  goal.value = -1;
+}
+
+function changePos(posName, posX, posY) {
+  if (posName == "start") {
+    var pos = document.getElementById("startPos");
+    pos.innerHTML = "Starting point: ("+posX+","+posY+")";
+  } else if (posName == "goal") {
+    var pos = document.getElementById("goalPos");
+    pos.innerHTML = "Ending point: ("+posX+","+posY+")";
+  }
 }
