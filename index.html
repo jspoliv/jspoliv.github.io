@@ -20,8 +20,8 @@
     <link rel="stylesheet" type="text/css" href="./assets/css/style.css" />
 
     <!-- P5.js -->
-    <script src="libraries/p5.min.js"></script>
-    <script src="libraries/p5.sound.min.js"></script>
+    <script rel="preconnect" src="libraries/p5.min.js"></script>
+    <!-- <script rel="preconnect" src="libraries/p5.sound.min.js"></script> -->
 
     <!-- HTMX -->
     <script
@@ -32,11 +32,11 @@
 
     <!-- Utility functions -->
     <script defer src="./assets/js/dark.js"></script>
-    <script defer src="./assets/js/rnd.js"></script>
+    <!-- <script defer src="./assets/js/rnd.js"></script> -->
     <script defer src="./assets/js/highlight.js"></script>
   </head>
 
-  <body>
+  <body onload="fullReset()">
     <main>
       <div id="mycanvas"></div>
       <div id="menu">
@@ -70,7 +70,7 @@
         </div>
         <p>
           Click on two pixels on the map to define a starting point and an end
-          point for the pathfinding. The starting and end points cannot be black
+          point for the pathfinding. The black pixels are not clickable
           (walls/impassable terrain).
         </p>
         <form id="form_grid">
@@ -100,6 +100,7 @@
               min="5"
               max="1000"
               required
+              onchange="enforceMinMax(this)"
             />
             <button
               name="dimension"
@@ -121,6 +122,7 @@
               min="0"
               max="30"
               required
+              onchange="enforceMinMax(this)"
             />
             <button
               name="density"
@@ -142,6 +144,7 @@
               min="0"
               max="999"
               required
+              onchange="enforceMinMax(this)"
             />
             <button
               name="seed"
@@ -154,6 +157,7 @@
           </div>
           <div class="submit_row">
             <button
+              id="solve_btn"
               class="submit_btn"
               type="submit"
               hx-get="http://127.0.0.1:8080/solve"
@@ -164,11 +168,12 @@
               SOLVE MAP
             </button>
             <button
+              id="generate_btn"
               class="submit_btn"
               type="submit"
               onclick="resetPos()"
               hx-get="http://127.0.0.1:8080/new_map"
-              hx-target="#map_response"
+              hx-target="#results"
               hx-swap="innerHtml"
               hx-include=".num_input"
             >
@@ -187,9 +192,10 @@
         </script>
         <div id="messageBoard">
           <p>
-            <div id="startPos">Starting point: (-1,-1)</div>
-            <div id="goalPos">Ending point: (-1,-1)</div>
+            <a id="startPos">Starting point: (-1,-1)</a><br />
+            <a id="goalPos">Ending point: (-1,-1)</a>
           </p>
+          <hr />
           <div id="results">
             <div id="map_response">
               <script>
@@ -200,12 +206,10 @@
             <p>Pathing cost: -1<br />Time Elapsed: -1<br /></p>
           </div>
         </div>
-        
       </div>
     </main>
   </body>
 
   <!-- JS for p5.js -->
-  <!-- <script src="./assets/js/test.js"></script> -->
   <script defer src="./assets/js/sketch.js"></script>
 </html>

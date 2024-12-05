@@ -112,7 +112,7 @@ label,
 .submit_btn {
   width: 50%;
   text-align: center;
-  outline: none;
+  /* outline: none; */
 }
 
 label {
@@ -148,6 +148,10 @@ a {
   border: 1px solid #1e1e1e;
 }
 
-.bordered {
+/* .bordered {
   outline: 2px solid red;
+} */
+
+hr {
+  margin-block: 0.5rem;
 }

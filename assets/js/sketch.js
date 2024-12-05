@@ -2,6 +2,7 @@ var dim = Math.sqrt(map_arr.length);
 var prev_dim = dim;
 var mousePrev = [-1, -1];
 var mousePos = [-1, -1];
+var result = [];
 
 function setup() {
   var canvas = createCanvas(dim, dim);
@@ -14,6 +15,11 @@ function setup() {
 function draw() {
   loadPixels();
   asciiToRgb();
+  result.forEach((pos) => {
+    let x = pos % dim;
+    let y = Math.floor(pos / dim);
+    set(x, y, 255);
+  });
   updatePixels();
   // background(255);
 }
@@ -60,6 +66,25 @@ function asciiToRgb() {
   }
 }
 
+function resetPos() {
+  mousePrev = [-1, -1];
+  mousePos = [-1, -1];
+
+  changePos("start", -1, -1);
+  changePos("goal", -1, -1);
+
+  document.getElementById("start").value = -1;
+  document.getElementById("goal").value = -1;
+  document.getElementById("solve_btn").disabled = false;
+}
+
+function fullReset() {
+  document.getElementById("dimension").value = 10;
+  document.getElementById("density").value = 30;
+  document.getElementById("seed").value = 998;
+  resetPos();
+}
+
 function changeMap() {
   if (prev_dim == dim) {
     redraw();
@@ -84,8 +109,7 @@ function mouseClicked() {
 
     changePos("start", mousePos[0], mousePos[1]);
 
-    var start = document.getElementById("start");
-    start.value = mousePos[0] + mousePos[1] * dim;
+    document.getElementById("start").value = mousePos[0] + mousePos[1] * dim;
     // fill("white");
     // text("c(" + (mousePos[0] + mousePos[1] * dim) + ")", 0, height / 8);
     // text("p(" + (mousePrev[0] + mousePrev[1] * dim) + ")", 0, height / 4);
@@ -99,11 +123,9 @@ function mouseClicked() {
 
     changePos("start", mousePrev[0], mousePrev[1]);
     changePos("goal", mousePos[0], mousePos[1]);
-    
-    var start = document.getElementById("start");
-    start.value = mousePrev[0] + mousePrev[1] * dim;
-    var goal = document.getElementById("goal");
-    goal.value = mousePos[0] + mousePos[1] * dim;
+
+    document.getElementById("start").value = mousePrev[0] + mousePrev[1] * dim;
+    document.getElementById("goal").value = mousePos[0] + mousePos[1] * dim;
     // fill("white");
     // text("c(" + (mousePos[0] + mousePos[1] * dim) + ")", 0, height / 8);
     // text("p(" + (mousePrev[0] + mousePrev[1] * dim) + ")", 0, height / 4);
@@ -116,25 +138,39 @@ function boundby(x, max) {
   return x;
 }
 
-function resetPos() {
-  mousePrev = [-1, -1];
-  mousePos = [-1, -1];
-
-  changePos("start", -1, -1);
-  changePos("goal", -1, -1);
-
-  var start = document.getElementById("start");
-  start.value = -1;
-  var goal = document.getElementById("goal");
-  goal.value = -1;
-}
-
 function changePos(posName, posX, posY) {
   if (posName == "start") {
-    var pos = document.getElementById("startPos");
-    pos.innerHTML = "Starting point: ("+posX+","+posY+")";
+    document.getElementById("startPos").innerHTML =
+      "Starting point: (" + posX + "," + posY + ")";
   } else if (posName == "goal") {
-    var pos = document.getElementById("goalPos");
-    pos.innerHTML = "Ending point: ("+posX+","+posY+")";
+    document.getElementById("goalPos").innerHTML =
+      "Ending point: (" + posX + "," + posY + ")";
+  }
+}
+
+function rnd_bound(e) {
+  document.getElementById("solve_btn").disabled = true;
+
+  let el = document.getElementById(e.getAttribute("name"));
+  do {
+    var rnd_val = Math.ceil(Math.random() * el.max);
+  } while (el.value == rnd_val);
+  el.value = el.min > rnd_val ? el.min : rnd_val;
+}
+
+function enforceMinMax(el) {
+  document.getElementById("solve_btn").disabled = true;
+
+  if (el.value == "") {
+    el.value = el.min;
+    return;
+  }
+
+  if (parseInt(el.value) < parseInt(el.min)) {
+    el.value = el.min;
+  } else if (parseInt(el.value) > parseInt(el.max)) {
+    el.value = el.max;
+  } else {
+    el.value = parseInt(el.value);
   }
 }
