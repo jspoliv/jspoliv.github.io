@@ -3,8 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="htmx-config" content='{"selfRequestsOnly":false}' />
-
+    <meta
+      name="htmx-config"
+      content='{
+        "responseHandling":[
+            {"code":"204", "swap": false},
+            {"code":"[23]..", "swap": true},
+            {"code":"422", "swap": true, "error":false},
+            {"code":"[45]..", "swap": false, "error":true},
+            {"code":"...", "swap": true}
+        ],
+        "selfRequestsOnly":false
+    }'
+    />
+    
     <title>A* Algorithm</title>
     <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico" />
 
@@ -79,14 +91,14 @@
             type="hidden"
             name="start"
             id="start"
-            class="num_input"
+            class="hidden_input"
             value="-1"
           />
           <input
             type="hidden"
             name="goal"
             id="goal"
-            class="num_input"
+            class="hidden_input"
             value="-1"
           />
           <div class="input_row">
@@ -163,7 +175,7 @@
               hx-get="http://127.0.0.1:8080/solve"
               hx-target="#results"
               hx-swap="innerHtml"
-              hx-include=".num_input"
+              hx-include=".num_input, .hidden_input"
             >
               SOLVE MAP
             </button>
