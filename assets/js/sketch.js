@@ -3,6 +3,7 @@ var prev_dim = dim;
 var mousePrev = [-1, -1];
 var mousePos = [-1, -1];
 var result = [];
+const colorCache = new Map();
 
 function setup() {
   var canvas = createCanvas(dim, dim);
@@ -14,61 +15,77 @@ function setup() {
 
 function draw() {
   loadPixels();
-  asciiToRgb();
-  result.forEach((pos) => {
-    let x = pos % dim;
-    let y = Math.floor(pos / dim);
-    set(x, y, 255);
-  });
+  colorMap();
+  if (result != null) {
+    result.forEach((pos) => {
+      set(pos % dim, floor(pos / dim), 255);
+    });
+  } else {
+    if (mousePrev[0] != -1) {
+      set(mousePrev[0], mousePrev[1], 255);
+    }
+    if (mousePos[0] != -1) {
+      set(mousePos[0], mousePos[1], 255);
+    }
+  }
   updatePixels();
   // background(255);
 }
 
-function asciiToRgb() {
+function colorMap() {
   let pos = 0;
   let r, g, b;
   for (let index = 0; index < map_arr.length; index++) {
-    if (map_arr[index] == "#") {
-      [r, g, b] = [0, 0, 0];
-    } else if (map_arr[index] == "*") {
-      [r, g, b] = [255, 255, 255];
-    } else if (map_arr[index] == "O" || map_arr[index] == "X") {
-      [r, g, b] = [255, 255, 0];
-    } else {
-      const intVal = map_arr.charCodeAt(index);
-      if (intVal <= 63) {
-        const norm = (intVal - 32) / 31.0;
-        r = 0;
-        g = Math.round(norm * 128);
-        b = 255 - Math.round(norm * 127);
-      } else if (intVal <= 79) {
-        const norm = (intVal - 63) / 16.0;
-        r = 0;
-        g = 128 + Math.round(norm * 127);
-        b = 128 - Math.round(norm * 128);
-      } else if (intVal <= 96) {
-        const norm = (intVal - 79) / 16.0;
-        r = Math.round(norm * 128);
-        g = 128 - Math.round(norm * 127);
-        b = 0;
-      } else {
-        const norm = (intVal - 96) / 31.0;
-        r = 128 + Math.round(norm * 127);
-        g = 128 - Math.round(norm * 128);
-        b = 0;
-      }
-    }
+    [r, g, b] = colorCache.get(map_arr[index]) || asciiToRGB(map_arr[index]);
+
     pixels[pos + 0] = r;
     pixels[pos + 1] = g;
     pixels[pos + 2] = b;
     pixels[pos + 3] = 255;
     pos += 4;
   }
+  // console.log("colorCache size: ", colorCache.size);
+}
+
+function asciiToRGB(input_char) {
+  let r, g, b;
+  if (input_char == "#") {
+    [r, g, b] = [0, 0, 0];
+  } else if (input_char == "*") {
+    [r, g, b] = [255, 255, 255];
+  } else {
+    const intVal = input_char.charCodeAt(0);
+    let norm;
+    if (intVal <= 63) {
+      norm = (intVal - 32) / 31.0;
+      r = 0;
+      g = floor(norm * 128);
+      b = 255 - floor(norm * 127);
+    } else if (intVal <= 79) {
+      norm = (intVal - 63) / 16.0;
+      r = 0;
+      g = 128 + floor(norm * 127);
+      b = 128 - floor(norm * 128);
+    } else if (intVal <= 95) {
+      norm = (intVal - 79) / 16.0;
+      r = floor(norm * 128);
+      g = 128 - floor(norm * 127);
+      b = 0;
+    } else {
+      norm = (intVal - 96) / 31.0;
+      r = 128 + floor(norm * 127);
+      g = 128 - floor(norm * 128);
+      b = 0;
+    }
+  }
+  colorCache.set(input_char, [r, g, b]);
+  return [r, g, b];
 }
 
 function resetPos() {
   mousePrev = [-1, -1];
   mousePos = [-1, -1];
+  result = null;
 
   changePos("start", -1, -1);
   changePos("goal", -1, -1);
@@ -76,6 +93,8 @@ function resetPos() {
   document.getElementById("start").value = -1;
   document.getElementById("goal").value = -1;
   document.getElementById("solve_btn").disabled = false;
+
+  // stateLog();
 }
 
 function fullReset() {
@@ -83,6 +102,23 @@ function fullReset() {
   document.getElementById("density").value = 30;
   document.getElementById("seed").value = 998;
   resetPos();
+}
+
+function stateLog() {
+  console.log("dim: ", dim, "prev_dim: ", prev_dim);
+  console.log("result is null: ", result == null);
+  console.log("mousePrev: ", mousePrev);
+  console.log("mousePos: ", mousePos);
+  console.log(document.getElementById("startPos").innerHTML);
+  console.log(document.getElementById("goalPos").innerHTML);
+  console.log("hidden start: ", document.getElementById("start").value);
+  console.log("hidden goal: ", document.getElementById("goal").value);
+  console.log("input dimension: ", document.getElementById("dimension").value);
+  console.log("input density: ", document.getElementById("density").value);
+  console.log("input seed: ", document.getElementById("seed").value);
+  console.log(
+    "----------------------------------------------------------------"
+  );
 }
 
 function changeMap() {
@@ -110,15 +146,16 @@ function mouseClicked() {
     changePos("start", mousePos[0], mousePos[1]);
 
     document.getElementById("start").value = mousePos[0] + mousePos[1] * dim;
-    // fill("white");
-    // text("c(" + (mousePos[0] + mousePos[1] * dim) + ")", 0, height / 8);
-    // text("p(" + (mousePrev[0] + mousePrev[1] * dim) + ")", 0, height / 4);
+
+    // stateLog();
   } else if (floor(mouseX) != mousePos[0] || floor(mouseY) != mousePos[1]) {
+    result = null;
     mousePrev = mousePos;
     mousePos = tmp;
     redraw();
     set(mousePrev[0], mousePrev[1], 255);
     set(mousePos[0], mousePos[1], 255);
+    text("mouseX: " + mouseX + "\nmouseY: " + mouseY, 0, height / 4);
     updatePixels();
 
     changePos("start", mousePrev[0], mousePrev[1]);
@@ -126,9 +163,8 @@ function mouseClicked() {
 
     document.getElementById("start").value = mousePrev[0] + mousePrev[1] * dim;
     document.getElementById("goal").value = mousePos[0] + mousePos[1] * dim;
-    // fill("white");
-    // text("c(" + (mousePos[0] + mousePos[1] * dim) + ")", 0, height / 8);
-    // text("p(" + (mousePrev[0] + mousePrev[1] * dim) + ")", 0, height / 4);
+
+    // stateLog();
   }
 }
 
