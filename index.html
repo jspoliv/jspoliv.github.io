@@ -36,11 +36,12 @@
     <!-- <script rel="preconnect" src="libraries/p5.sound.min.js"></script> -->
 
     <!-- HTMX -->
-    <script
+    <script rel="preconnect" src="libraries/htmx.org@2.0.3.min.js"></script>
+    <!-- <script
       src="https://unpkg.com/htmx.org@2.0.3"
       integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq"
       crossorigin="anonymous"
-    ></script>
+    ></script> -->
 
     <!-- Utility functions -->
     <script defer src="./assets/js/dark.js"></script>
@@ -84,7 +85,10 @@
           Click on two pixels on the map to define a starting point and an end
           point for the pathfinding. The black pixels are not clickable
           (walls/impassable terrain).
-          <br />Backend available via docker: `docker run --rm -p 8080:8080 jspoliv/astar`
+          <br />Backend available via docker:
+          <span id="docker-cmd"
+            >docker run --rm -p 8080:8080 jspoliv/astar</span
+          >
         </p>
         <form id="form_grid">
           <input
@@ -222,6 +226,11 @@
     </main>
   </body>
 
+  <script>
+    addEventListener("load", () => {
+      htmx.ajax('GET', 'http://127.0.0.1:8080/map/new?dimension=10&density=30&seed=998', '#results')
+    });
+  </script>
   <!-- JS for p5.js -->
   <script defer src="./assets/js/sketch.js"></script>
 </html>

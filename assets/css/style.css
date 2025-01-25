@@ -148,6 +148,13 @@ a {
   border: 1px solid #1e1e1e;
 }
 
+#docker-cmd {
+  background-color: whitesmoke;
+  color: black;
+  border-radius: 0.25rem;
+  padding-inline: 0.25rem;
+}
+
 /* .bordered {
   outline: 2px solid red;
 } */
