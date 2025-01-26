@@ -1,10 +1,24 @@
+/** @type {number} */
 var dim = Math.sqrt(map_arr.length);
+
+/** @type {number} */
 var prev_dim = dim;
+
+/** @type {number[]} */
 var mousePrev = [-1, -1];
+
+/** @type {number[]} */
 var mousePos = [-1, -1];
+
+/** @type {?number[]} */
 var result = [];
+
+/** @type {Map<string, number[]>} */
 const colorCache = new Map();
 
+/**
+ * Create and setup the canvas. Called by p5.js
+ */
 function setup() {
   var canvas = createCanvas(dim, dim);
   canvas.parent("mycanvas");
@@ -13,6 +27,9 @@ function setup() {
   // background(255);
 }
 
+/**
+ * Draws the canvas. Called by p5.js
+ */
 function draw() {
   loadPixels();
   colorMap();
@@ -32,6 +49,9 @@ function draw() {
   // background(255);
 }
 
+/**
+ * Fills the canvas with the corresponding RGBA value for each character in the global map_arr.
+ */
 function colorMap() {
   let pos = 0;
   let r, g, b;
@@ -47,6 +67,11 @@ function colorMap() {
   // console.log("colorCache size: ", colorCache.size);
 }
 
+/**
+ * Converts ASCII characters to RGB.
+ * @param {string} input_char ASCII character to be converted to RGB
+ * @returns {number[]} array with the corresponding red, green and blue values
+ */
 function asciiToRGB(input_char) {
   let r, g, b;
   if (input_char == "#") {
@@ -82,6 +107,9 @@ function asciiToRGB(input_char) {
   return [r, g, b];
 }
 
+/**
+ * Resets global variables.
+ */
 function resetPos() {
   mousePrev = [-1, -1];
   mousePos = [-1, -1];
@@ -97,6 +125,9 @@ function resetPos() {
   // stateLog();
 }
 
+/**
+ * Sets default values and resets global variables.
+ */
 function fullReset() {
   document.getElementById("dimension").value = 10;
   document.getElementById("density").value = 30;
@@ -104,6 +135,9 @@ function fullReset() {
   resetPos();
 }
 
+/**
+ * Logging of global variables.
+ */
 function stateLog() {
   console.log("dim: ", dim, "prev_dim: ", prev_dim);
   console.log("result is null: ", result == null);
@@ -121,6 +155,9 @@ function stateLog() {
   );
 }
 
+/**
+ * Redraws the canvas; resizes the canvas if it's new dimension differs from the previous one.
+ */
 function changeMap() {
   if (prev_dim == dim) {
     redraw();
@@ -130,9 +167,16 @@ function changeMap() {
   resizeCanvas(dim, dim);
 }
 
+/**
+ * Mouse clicked event handler from p5.js
+ */
 function mouseClicked() {
-  if (mouseX < 0 || mouseX >= dim || mouseY < 0 || mouseY >= dim) return;
-  let tmp = [boundby(floor(mouseX), dim), boundby(floor(mouseY), dim)];
+  if (mouseX < 0 || mouseX >= dim || mouseY < 0 || mouseY >= dim)
+    return;
+  let tmp = [
+    boundby(floor(mouseX), dim),
+    boundby(floor(mouseY), dim),
+  ];
   if (map_arr[tmp[0] + tmp[1] * dim] == "#") {
     return;
   }
@@ -145,7 +189,8 @@ function mouseClicked() {
 
     changePos("start", mousePos[0], mousePos[1]);
 
-    document.getElementById("start").value = mousePos[0] + mousePos[1] * dim;
+    document.getElementById("start").value =
+      mousePos[0] + mousePos[1] * dim;
 
     // stateLog();
   } else if (floor(mouseX) != mousePos[0] || floor(mouseY) != mousePos[1]) {
@@ -161,19 +206,33 @@ function mouseClicked() {
     changePos("start", mousePrev[0], mousePrev[1]);
     changePos("goal", mousePos[0], mousePos[1]);
 
-    document.getElementById("start").value = mousePrev[0] + mousePrev[1] * dim;
-    document.getElementById("goal").value = mousePos[0] + mousePos[1] * dim;
+    document.getElementById("start").value =
+      mousePrev[0] + mousePrev[1] * dim;
+    document.getElementById("goal").value =
+      mousePos[0] + mousePos[1] * dim;
 
     // stateLog();
   }
 }
 
+/**
+ * Checks if 0 < x < max
+ * @param {number} x
+ * @param {number} max
+ * @returns {number} returns X if 0 < x < max, otherwise returns whatever is closest to X, be it 0 or MAX-1
+ */
 function boundby(x, max) {
   if (x < 0) return 0;
   else if (x >= max) return max - 1;
   return x;
 }
 
+/**
+ * Changes the displayed Starting or Ending position.
+ * @param {string} posName "start" or "goal" respective to what element should be changed
+ * @param {number} posX mouse X position
+ * @param {number} posY mouse Y position
+ */
 function changePos(posName, posX, posY) {
   if (posName == "start") {
     document.getElementById("startPos").innerHTML =
@@ -184,6 +243,10 @@ function changePos(posName, posX, posY) {
   }
 }
 
+/**
+ * Randomizes the value of an input, the value is bound by the input's min and max values.
+ * @param {HTMLElement} e button that calls this fuction, the button's "name" should be the same as the input's "id"
+ */
 function rnd_bound(e) {
   document.getElementById("solve_btn").disabled = true;
 
@@ -194,6 +257,10 @@ function rnd_bound(e) {
   el.value = el.min > rnd_val ? el.min : rnd_val;
 }
 
+/**
+ * Checks if the input's value is an integer, checks if the value abides by the input's min and max values.
+ * @param {HTMLElement} el
+ */
 function enforceMinMax(el) {
   document.getElementById("solve_btn").disabled = true;
 
