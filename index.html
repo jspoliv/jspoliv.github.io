@@ -46,7 +46,6 @@
     <!-- Utility functions -->
     <script defer src="./assets/js/dark.js"></script>
     <!-- <script defer src="./assets/js/rnd.js"></script> -->
-    <script defer src="./assets/js/highlight.js"></script>
   </head>
 
   <body onload="fullReset()">
@@ -83,12 +82,11 @@
         </div>
         <p>
           Click on two pixels on the map to define a starting point and an end
-          point for the pathfinding. The black pixels are not clickable
-          (walls/impassable terrain).
-          <br />Backend available via docker:
-          <span id="docker-cmd"
-            >docker run --rm -p 8080:8080 jspoliv/astar</span
-          >
+          point for the pathfinding. <br />
+          The black pixels are not clickable (walls/impassable terrain). <br />
+          The map has NxN pixels. <br />
+          Each color has it's own pathing cost (bluest = lowest; green = mid;
+          reddest = highest; black/wall = impassable terrain).
         </p>
         <form id="form_grid">
           <input
@@ -106,11 +104,11 @@
             value="-1"
           />
           <div class="input_row">
-            <label for="dimension" class="highlight_map">Map Size (N)</label>
+            <label for="dimension">Map Size (N)</label>
             <input
               id="dimension"
               name="dimension"
-              class="num_input highlight_map"
+              class="num_input"
               type="number"
               value="10"
               min="5"
@@ -128,11 +126,11 @@
             </button>
           </div>
           <div class="input_row">
-            <label for="density" class="highlight_wall">Wall Amount (%)</label>
+            <label for="density">Wall Amount (%)</label>
             <input
               id="density"
               name="density"
-              class="num_input highlight_wall"
+              class="num_input"
               type="number"
               value="30"
               min="0"
@@ -198,10 +196,11 @@
           </div>
         </form>
         <p>
-          <a class="highlight_map">The map has NxN pixels.</a>
-          Each color has it's own pathing cost (bluest = lowest; green = mid;
-          reddest = highest;
-          <a class="highlight_wall">black/wall = impassable terrain</a>).
+          This site contains only the frontend for this application, you can run
+          the backend via docker:
+          <span id="docker-cmd"
+            >docker run --rm -p 8080:8080 jspoliv/astar</span
+          >
         </p>
         <script>
           var map_arr = "";
@@ -228,7 +227,11 @@
 
   <script>
     addEventListener("load", () => {
-      htmx.ajax('GET', 'http://127.0.0.1:8080/map/new?dimension=10&density=30&seed=998', '#results')
+      htmx.ajax(
+        "GET",
+        "http://127.0.0.1:8080/map/new?dimension=10&density=30&seed=998",
+        "#results"
+      );
     });
   </script>
   <!-- JS for p5.js -->
